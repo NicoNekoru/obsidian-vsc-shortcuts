@@ -1,4 +1,4 @@
-import { Plugin } from 'obsidian';
+import { Plugin, Editor } from 'obsidian';
 
 export class VSCShortcuts extends Plugin 
 {
@@ -7,15 +7,39 @@ export class VSCShortcuts extends Plugin
 		console.log('loading vsc shortcuts plugin');
 
 		this.addCommand({
-			id: '',
-			name: '',
-			editorCheckCallback(checking, editor, ctx) 
+			id: 'move-up',
+			name: 'Move current line up',
+			editorCallback(editor) 
 			{
-				checking;
-				editor;
-				ctx;
+				const selectedLine = editor.getLine(editor.getCursor().line);
+				const lineAbove = editor.getLine(Math.max(0, editor.getCursor().line - 1));
+				editor.setLine(Math.max(editor.getCursor().line - 1, 0), selectedLine);
+				editor.setLine(editor.getCursor().line, lineAbove);
+				editor.setCursor(Math.max(editor.getCursor().line - 1, 0));
 			},
 		});
+		
+		this.addCommand({
+			id: 'move-down',
+			name: 'Move current line down',
+			editorCallback(editor) 
+			{
+				const selectedLine = editor.getLine(editor.getCursor().line);
+				const lineBelow = editor.getLine(Math.min(editor.lastLine(), editor.getCursor().line + 1));
+				editor.setLine(Math.min(editor.lastLine(), editor.getCursor().line + 1), selectedLine);
+				editor.setLine(editor.getCursor().line, lineBelow);
+				editor.setCursor(Math.min(editor.lastLine(), editor.getCursor().line + 1));
+			},
+		});
+
+		this.addCommand({
+			id: 'example-command',
+			name: 'Example command',
+			editorCallback: (editor: Editor, view: MarkdownView) => 
+			{
+				console.log(editor.getCursor());
+			},
+		});		  
 	}
 
 	onunload() 
