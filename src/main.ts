@@ -30,16 +30,7 @@ export class VSCShortcuts extends Plugin
 				editor.setLine(editor.getCursor().line, lineBelow);
 				editor.setCursor(Math.min(editor.lastLine(), editor.getCursor().line + 1));
 			},
-		});
-
-		this.addCommand({
-			id: 'example-command',
-			name: 'Example command',
-			editorCallback: (editor: Editor, view: MarkdownView) => 
-			{
-				console.log(editor.getCursor());
-			},
-		});		  
+		});	  
 	}
 
 	onunload() 
