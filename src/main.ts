@@ -67,6 +67,48 @@ export class VSCShortcuts extends Plugin
 		});
 		
 		this.addCommand({
+			id: 'delete-line',
+			name: 'Delete current line',
+			editorCallback(editor) 
+			{
+				const { line } = editor.getCursor();
+				const editorArray = editor.getValue().split('\n');
+				
+				editorArray.splice(line, 1);
+				editor.setValue(editorArray.join('\n'));
+				editor.setCursor(line);
+			},
+		});
+		
+		this.addCommand({
+			id: 'insert-below',
+			name: 'Insert line below',
+			editorCallback(editor) 
+			{
+				const { line, ch } = editor.getCursor();
+				const editorArray = editor.getValue().split('\n');
+				
+				editorArray[line] += '\n';
+				editor.setValue(editorArray.join('\n'));
+				editor.setCursor(line, ch);
+			},
+		});
+		
+		this.addCommand({
+			id: 'insert-above',
+			name: 'Insert line above',
+			editorCallback(editor) 
+			{
+				const { line, ch } = editor.getCursor();
+				const editorArray = editor.getValue().split('\n');
+				
+				editorArray[line] = '\n' + editorArray[line];
+				editor.setValue(editorArray.join('\n'));
+				editor.setCursor(line + 1, ch);
+			},
+		});
+
+		this.addCommand({
 			id: 'test',
 			name: 'Test function',
 			editorCallback(editor, ctx) 
