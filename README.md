@@ -1,6 +1,6 @@
 # Obsidian VSC Shortcuts
 
-![shortcut list](./assets/shortcut_list.png.png)
+![shortcut list](./assets/shortcut_list.png)
 
 ## Basic editing
 - Ctrl+X Cut line (empty selection) (default)
