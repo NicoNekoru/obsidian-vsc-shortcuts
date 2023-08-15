@@ -107,6 +107,28 @@ export class VSCShortcuts extends Plugin
 				editor.setCursor(line + 1, ch);
 			},
 		});
+		
+		this.addCommand({
+			id: 'scroll-up',
+			name: 'Scroll line up',
+			editorCallback(editor) 
+			{
+				const { top } = editor.getScrollInfo();
+				editor.scrollTo(0, Math.max(top - 16, 0));
+			},
+		});
+		
+		this.addCommand({
+			id: 'scroll-down',
+			name: 'Scroll line down',
+			editorCallback(editor, /* ctx */) 
+			{
+				const { top } = editor.getScrollInfo();
+				// console.log(ctx.app.vault.getAbstractFileByPath('/.obsidian/appearance.json'));
+				// TODO: dynamics - change +16 to +lineHeight 
+				editor.scrollTo(0, top + 16);
+			},
+		});
 
 		this.addCommand({
 			id: 'test',
