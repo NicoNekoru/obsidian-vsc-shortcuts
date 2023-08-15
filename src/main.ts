@@ -118,7 +118,7 @@ export class VSCShortcuts extends Plugin
 		this.addCommand({
 			id: 'scroll-up',
 			name: 'Scroll line up',
-			editorCallback(editor) 
+			editorCallback(editor, ctx) 
 			{
 				const { top } = editor.getScrollInfo();
 				// @ts-expect-error vault.config and vault.getConfig are not documented in obsidian.d.ts
@@ -141,6 +141,34 @@ export class VSCShortcuts extends Plugin
 				editor.scrollTo(0, top + lineHeight);
 			},
 			hotkeys: [{ key: 'ArrowDown', modifiers: ['Ctrl'] }],
+		});
+
+		this.addCommand({
+			id: 'scroll-page-up',
+			name: 'Scroll page up',
+			editorCallback(editor, ctx) 
+			{
+				const { top } = editor.getScrollInfo();
+				// @ts-expect-error vault.config and vault.getConfig are not documented in obsidian.d.ts
+				const lineHeight = ctx.app.vault.getConfig('baseFontSize') || 16;
+
+				editor.scrollTo(0, Math.max(top - lineHeight, 0));
+			},
+			hotkeys: [{ key: 'PageUp', modifiers: ['Alt'] }],
+		});
+		
+		this.addCommand({
+			id: 'scroll-page-down',
+			name: 'Scroll page down',
+			editorCallback(editor, ctx) 
+			{
+				const { top } = editor.getScrollInfo();
+				// @ts-expect-error vault.config and vault.getConfig are not documented in obsidian.d.ts
+				const lineHeight = ctx.app.vault.getConfig('baseFontSize') || 16;
+
+				editor.scrollTo(0, top + lineHeight);
+			},
+			hotkeys: [{ key: 'PageDown', modifiers: ['Alt'] }],
 		});
 
 		this.addCommand({
