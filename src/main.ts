@@ -20,6 +20,7 @@ export class VSCShortcuts extends Plugin
 				editor.setLine(line, lineAbove);
 				editor.setCursor(upperPosition, ch);
 			},
+			hotkeys: [{ key: 'ArrowUp', modifiers: ['Alt'] }],
 		});
 		
 		this.addCommand({
@@ -36,6 +37,7 @@ export class VSCShortcuts extends Plugin
 				editor.setLine(line, lineBelow);
 				editor.setCursor(lowerPosition, ch);
 			},
+			hotkeys: [{ key: 'ArrowDown', modifiers: ['Alt'] }],
 		});
 		
 		this.addCommand({
@@ -50,6 +52,7 @@ export class VSCShortcuts extends Plugin
 				editor.setValue(editorArray.join('\n'));
 				editor.setCursor(line + 1, ch);
 			},
+			hotkeys: [{ key: 'ArrowDown', modifiers: ['Alt', 'Shift'] }],
 		});
 		
 		this.addCommand({
@@ -64,6 +67,7 @@ export class VSCShortcuts extends Plugin
 				editor.setValue(editorArray.join('\n'));
 				editor.setCursor(line, ch);
 			},
+			hotkeys: [{ key: 'ArrowUp', modifiers: ['Alt', 'Shift'] }],
 		});
 		
 		this.addCommand({
@@ -78,6 +82,7 @@ export class VSCShortcuts extends Plugin
 				editor.setValue(editorArray.join('\n'));
 				editor.setCursor(line);
 			},
+			hotkeys: [{ key: 'k', modifiers: ['Ctrl', 'Shift'] }],
 		});
 		
 		this.addCommand({
@@ -92,6 +97,7 @@ export class VSCShortcuts extends Plugin
 				editor.setValue(editorArray.join('\n'));
 				editor.setCursor(line, ch);
 			},
+			hotkeys: [{ key: 'Enter', modifiers: ['Ctrl'] }],
 		});
 		
 		this.addCommand({
@@ -106,6 +112,7 @@ export class VSCShortcuts extends Plugin
 				editor.setValue(editorArray.join('\n'));
 				editor.setCursor(line + 1, ch);
 			},
+			hotkeys: [{ key: 'Enter', modifiers: ['Ctrl', 'Shift'] }],
 		});
 		
 		this.addCommand({
@@ -114,20 +121,26 @@ export class VSCShortcuts extends Plugin
 			editorCallback(editor) 
 			{
 				const { top } = editor.getScrollInfo();
-				editor.scrollTo(0, Math.max(top - 16, 0));
+				// @ts-expect-error vault.config and vault.getConfig are not documented in obsidian.d.ts
+				const lineHeight = ctx.app.vault.getConfig('baseFontSize') || 16;
+
+				editor.scrollTo(0, Math.max(top - lineHeight, 0));
 			},
+			hotkeys: [{ key: 'ArrowUp', modifiers: ['Ctrl'] }],
 		});
 		
 		this.addCommand({
 			id: 'scroll-down',
 			name: 'Scroll line down',
-			editorCallback(editor, /* ctx */) 
+			editorCallback(editor, ctx) 
 			{
 				const { top } = editor.getScrollInfo();
-				// console.log(ctx.app.vault.getAbstractFileByPath('/.obsidian/appearance.json'));
-				// TODO: dynamics - change +16 to +lineHeight 
-				editor.scrollTo(0, top + 16);
+				// @ts-expect-error vault.config and vault.getConfig are not documented in obsidian.d.ts
+				const lineHeight = ctx.app.vault.getConfig('baseFontSize') || 16;
+
+				editor.scrollTo(0, top + lineHeight);
 			},
+			hotkeys: [{ key: 'ArrowDown', modifiers: ['Ctrl'] }],
 		});
 
 		this.addCommand({
