@@ -1,4 +1,4 @@
-import { Plugin, Editor } from 'obsidian';
+import { Plugin } from 'obsidian';
 
 export class VSCShortcuts extends Plugin 
 {
@@ -11,11 +11,14 @@ export class VSCShortcuts extends Plugin
 			name: 'Move current line up',
 			editorCallback(editor) 
 			{
-				const selectedLine = editor.getLine(editor.getCursor().line);
-				const lineAbove = editor.getLine(Math.max(0, editor.getCursor().line - 1));
-				editor.setLine(Math.max(editor.getCursor().line - 1, 0), selectedLine);
-				editor.setLine(editor.getCursor().line, lineAbove);
-				editor.setCursor(Math.max(editor.getCursor().line - 1, 0));
+				const { line, ch } = editor.getCursor();
+				const upperPosition = Math.max(0, line - 1);
+				const selectedLine = editor.getLine(line);
+				const lineAbove = editor.getLine(upperPosition);
+				
+				editor.setLine(upperPosition, selectedLine);
+				editor.setLine(line, lineAbove);
+				editor.setCursor(upperPosition, ch);
 			},
 		});
 		
@@ -24,13 +27,56 @@ export class VSCShortcuts extends Plugin
 			name: 'Move current line down',
 			editorCallback(editor) 
 			{
-				const selectedLine = editor.getLine(editor.getCursor().line);
-				const lineBelow = editor.getLine(Math.min(editor.lastLine(), editor.getCursor().line + 1));
-				editor.setLine(Math.min(editor.lastLine(), editor.getCursor().line + 1), selectedLine);
-				editor.setLine(editor.getCursor().line, lineBelow);
-				editor.setCursor(Math.min(editor.lastLine(), editor.getCursor().line + 1));
+				const { line, ch } = editor.getCursor();
+				const lowerPosition = Math.min(editor.lastLine(), line + 1);
+				const selectedLine = editor.getLine(line);
+				const lineBelow = editor.getLine(lowerPosition);
+				
+				editor.setLine(lowerPosition, selectedLine);
+				editor.setLine(line, lineBelow);
+				editor.setCursor(lowerPosition, ch);
 			},
-		});	  
+		});
+		
+		this.addCommand({
+			id: 'copy-down',
+			name: 'Copy current line down',
+			editorCallback(editor) 
+			{
+				const { line, ch } = editor.getCursor();
+				const editorArray = editor.getValue().split('\n');
+				
+				editorArray[line] += '\n' + editorArray[line];
+				editor.setValue(editorArray.join('\n'));
+				editor.setCursor(line + 1, ch);
+			},
+		});
+		
+		this.addCommand({
+			id: 'copy-up',
+			name: 'Copy current line up',
+			editorCallback(editor) 
+			{
+				const { line, ch } = editor.getCursor();
+				const editorArray = editor.getValue().split('\n');
+				
+				editorArray[line] += '\n' + editorArray[line];
+				editor.setValue(editorArray.join('\n'));
+				editor.setCursor(line, ch);
+			},
+		});
+		
+		this.addCommand({
+			id: 'test',
+			name: 'Test function',
+			editorCallback(editor, ctx) 
+			{
+				console.log({ editor, ctx });
+				editor.getValue();
+			},
+		});
+
+
 	}
 
 	onunload() 
