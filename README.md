@@ -32,6 +32,22 @@
 	- Shift+Alt+A Toggle block comment (cs)
 	- Alt+Z Toggle word wrap (not useful)
 
+### Multi-cursor and selection
+- Obsidian Default
+	- Alt+Click Insert cursor
+- Features + roadmap
+	- [ ] Ctrl+Alt+ ↑ / ↓ Insert cursor above / below
+	- [ ] Ctrl+U Undo last cursor operation
+	- [ ] Shift+Alt+I Insert cursor at end of each line selected
+	- [ ] Ctrl+L Select current line
+	- [ ] Ctrl+Shift+L Select all occurrences of current selection
+	- [ ] Ctrl+F2 Select all occurrences of current word
+	- [ ] Shift+Alt+→ Expand selection
+	- [ ] Shift+Alt+← Shrink selection
+	- [ ] Shift+Alt + (drag mouse) Column (box) selection
+	- [ ] Ctrl+Shift+Alt + (arrow key) Column (box) selection
+	- [ ] Ctrl+Shift+Alt+PgUp/PgDn Column (box) selection page up/down
+
 ---
 
 Further completing [timhor's editor shortcuts](https://github.com/timhor/obsidian-editor-shortcuts/)
