@@ -229,15 +229,36 @@ export class VSCShortcuts extends Plugin
 			},
 			hotkeys: [{ key: 'I', modifiers: ['Alt', 'Shift'] }],
 		});
+		this.addCommand({
+			id: 'select-line',
+			name: 'Select current line',
+			editorCallback(editor) 
+			{
+				const newSelections = editor.listSelections().flatMap(selection => 
+				{
+					const 
+						upperBound = Math.max(selection.head.line, selection.anchor.line), 
+						lowerBound = Math.min(selection.head.line, selection.anchor.line);
+					
+					return Array.from(
+						{ length: upperBound - lowerBound + 1 },
+						(_, i) => [i + lowerBound, editor.getLine(i + lowerBound).length]
+					).map(([lineNumber, lineLength]): EditorSelectionOrCaret => (
+						{
+							head: { line: lineNumber, ch: lineLength },
+							anchor: { line: lineNumber, ch: 0 }
+						}
+					));
+				});
+				editor.setSelections(newSelections);
+			},
+			hotkeys: [{ key: 'L', modifiers: ['Ctrl'] }],
+		});
 
 		this.addCommand({
 			id: 'test',
 			name: 'Test function',
-			editorCallback(editor, ctx) 
-			{
-				console.log({ editor, ctx });
-				editor.getValue();
-			},
+			editorCallback: (editor, ctx) => console.log({ editor, ctx }),
 		});
 
 

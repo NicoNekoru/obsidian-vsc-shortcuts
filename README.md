@@ -39,7 +39,7 @@
 	- [x] Ctrl+Alt+ ↑ / ↓ Insert cursor above / below
 	- [ ] Ctrl+U Undo last cursor operation
 	- [x] Shift+Alt+I Insert cursor at end of each line selected
-	- [ ] Ctrl+L Select current line
+	- [x] Ctrl+L Select current line
 	- [ ] Ctrl+Shift+L Select all occurrences of current selection
 	- [ ] Ctrl+F2 Select all occurrences of current word
 	- [ ] Shift+Alt+→ Expand selection
