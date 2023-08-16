@@ -1,4 +1,4 @@
-import { Plugin } from 'obsidian';
+import { EditorSelectionOrCaret, Plugin } from 'obsidian';
 
 export class VSCShortcuts extends Plugin 
 {
@@ -202,6 +202,32 @@ export class VSCShortcuts extends Plugin
 				editor.setSelections([...currentSelections, ...newSelections]);
 			},
 			hotkeys: [{ key: 'ArrowDown', modifiers: ['Alt', 'Ctrl'] }],
+		});
+		
+		this.addCommand({
+			id: 'insert-cursor-at-lines',
+			name: 'Insert cursor at end of each line selected',
+			editorCallback(editor) 
+			{
+				const newSelections = editor.listSelections().flatMap(selection => 
+				{
+					const 
+						upperBound = Math.max(selection.head.line, selection.anchor.line), 
+						lowerBound = Math.min(selection.head.line, selection.anchor.line);
+					
+					return Array.from(
+						{ length: upperBound - lowerBound + 1 },
+						(_, i) => [i + lowerBound, editor.getLine(i + lowerBound).length]
+					).map(([lineNumber, lineLength]): EditorSelectionOrCaret => (
+						{
+							head: { line: lineNumber, ch: lineLength },
+							anchor: { line: lineNumber, ch: lineLength }
+						}
+					));
+				});
+				editor.setSelections(newSelections);
+			},
+			hotkeys: [{ key: 'I', modifiers: ['Alt', 'Shift'] }],
 		});
 
 		this.addCommand({
