@@ -170,6 +170,41 @@ export class VSCShortcuts extends Plugin
 		});
 
 		this.addCommand({
+			id: 'insert-cursor-above',
+			name: 'Insert cursor above',
+			editorCallback(editor) 
+			{
+				const currentSelections = editor.listSelections();
+				const newSelections = editor.listSelections().map(selection => 
+				{
+					selection.head.line = Math.max(0, selection.head.line - 1);
+					selection.anchor = selection.head;
+					return selection;
+				});
+
+				editor.setSelections([...currentSelections, ...newSelections]);
+			},
+			hotkeys: [{ key: 'ArrowUp', modifiers: ['Alt', 'Ctrl'] }],
+		});
+		
+		this.addCommand({
+			id: 'insert-cursor-below',
+			name: 'Insert cursor below',
+			editorCallback(editor) 
+			{
+				const currentSelections = editor.listSelections();
+				const newSelections = editor.listSelections().map(selection => 
+				{
+					selection.head.line = selection.head.line + 1;
+					selection.anchor = selection.head;
+					return selection;
+				});
+				editor.setSelections([...currentSelections, ...newSelections]);
+			},
+			hotkeys: [{ key: 'ArrowDown', modifiers: ['Alt', 'Ctrl'] }],
+		});
+
+		this.addCommand({
 			id: 'test',
 			name: 'Test function',
 			editorCallback(editor, ctx) 

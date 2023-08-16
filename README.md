@@ -36,7 +36,7 @@
 - Obsidian Default
 	- Alt+Click Insert cursor
 - Features + roadmap
-	- [ ] Ctrl+Alt+ ↑ / ↓ Insert cursor above / below
+	- [x] Ctrl+Alt+ ↑ / ↓ Insert cursor above / below
 	- [ ] Ctrl+U Undo last cursor operation
 	- [ ] Shift+Alt+I Insert cursor at end of each line selected
 	- [ ] Ctrl+L Select current line
