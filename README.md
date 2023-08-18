@@ -29,7 +29,7 @@
 	- Ctrl+K Ctrl+C Add line comment (cs)
 	- Ctrl+K Ctrl+U Remove line comment (cs)
 	- Ctrl+/ Toggle line comment (cs)
-	- Shift+Alt+A Toggle block comment (cs)
+  	- Shift+Alt+A Toggle block comment (cs)
 	- Alt+Z Toggle word wrap (not useful)
 
 ### Multi-cursor and selection

@@ -341,28 +341,15 @@ export class VSCShortcuts extends Plugin
 						upperBound = Math.max(selection.head.line, selection.anchor.line), 
 						lowerBound = Math.min(selection.head.line, selection.anchor.line);
 					
-					return Array.from(
-						{ length: upperBound - lowerBound + 1 },
-						(_, i) => [i + lowerBound, editor.getLine(i + lowerBound).length]
-					).map(([lineNumber, lineLength]): EditorSelectionOrCaret => (
-						{
-							head: { line: lineNumber, ch: lineLength },
-							anchor: { line: lineNumber, ch: 0 }
-						}
-					));
+					return {
+						head: { line: upperBound + 1, ch: 0 },
+						anchor: { line: lowerBound, ch: 0 }
+					};
 				});
 				editor.setSelections(newSelections);
 			},
 			hotkeys: [{ key: 'L', modifiers: ['Ctrl'] }],
 		});
-
-		this.addCommand({
-			id: 'test',
-			name: 'Test function',
-			editorCallback: (editor, ctx) => console.log({ editor, ctx }),
-		});
-
-
 	}
 
 	onunload() 
