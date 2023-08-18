@@ -266,15 +266,19 @@ export class VSCShortcuts extends Plugin
 			name: 'Insert cursor above',
 			editorCallback(editor) 
 			{
-				const currentSelections = editor.listSelections();
-				const newSelections = editor.listSelections().map(selection => 
+				const cursors: Array<EditorSelectionOrCaret> = [...editor.listSelections()];
+				editor.listSelections().forEach(selection => 
 				{
-					selection.head.line = Math.max(0, selection.head.line - 1);
-					selection.anchor = selection.head;
-					return selection;
+					if (selection.head.line <= 0) return;
+					const line = selection.head.line - 1;
+					const ch = Math.min(selection.head.ch, editor.getLine(line).length);
+					const select = { line, ch };
+					cursors.push({ 
+						head: select,
+						anchor: select
+					});
 				});
-
-				editor.setSelections([...currentSelections, ...newSelections]);
+				editor.setSelections(cursors);
 			},
 			hotkeys: [{ key: 'ArrowUp', modifiers: ['Alt', 'Ctrl'] }],
 		});
@@ -284,14 +288,19 @@ export class VSCShortcuts extends Plugin
 			name: 'Insert cursor below',
 			editorCallback(editor) 
 			{
-				const currentSelections = editor.listSelections();
-				const newSelections = editor.listSelections().map(selection => 
+				const cursors: Array<EditorSelectionOrCaret> = [...editor.listSelections()];
+				editor.listSelections().forEach(selection => 
 				{
-					selection.head.line = selection.head.line + 1;
-					selection.anchor = selection.head;
-					return selection;
+					if (selection.head.line >= editor.lastLine()) return;
+					const line = selection.head.line + 1;
+					const ch = Math.min(selection.head.ch, editor.getLine(line).length);
+					const select = { line, ch };
+					cursors.push({ 
+						head: select,
+						anchor: select
+					});
 				});
-				editor.setSelections([...currentSelections, ...newSelections]);
+				editor.setSelections(cursors);
 			},
 			hotkeys: [{ key: 'ArrowDown', modifiers: ['Alt', 'Ctrl'] }],
 		});
