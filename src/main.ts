@@ -11,14 +11,25 @@ export class VSCShortcuts extends Plugin
 			name: 'Move current line up',
 			editorCallback(editor) 
 			{
-				const { line, ch } = editor.getCursor();
-				const upperPosition = Math.max(0, line - 1);
-				const selectedLine = editor.getLine(line);
-				const lineAbove = editor.getLine(upperPosition);
-				
-				editor.setLine(upperPosition, selectedLine);
-				editor.setLine(line, lineAbove);
-				editor.setCursor(upperPosition, ch);
+				const cursors: Array<EditorSelectionOrCaret> = [];
+				const editorArray = editor.getValue().split('\n');
+				editor.listSelections().forEach(selection => 
+				{
+					const upperLine = Math.min(selection.head.line, selection.anchor.line);
+					const lowerLine = Math.max(selection.head.line, selection.anchor.line);
+					if (upperLine === 0) return cursors.push(selection);
+					
+					const upperPosition = upperLine - 1;
+					const selectedLines = editorArray.splice(upperLine, lowerLine - upperLine + 1);
+					editorArray.splice(upperPosition, 0, ...selectedLines);
+
+					cursors.push({
+						head: { line: selection.head.line - 1, ch: selection.head.ch },
+						anchor: { line: selection.anchor.line - 1, ch: selection.anchor.ch },
+					});
+				});
+				editor.setValue(editorArray.join('\n'));
+				editor.setSelections(cursors);
 			},
 			hotkeys: [{ key: 'ArrowUp', modifiers: ['Alt'] }],
 		});
@@ -28,14 +39,24 @@ export class VSCShortcuts extends Plugin
 			name: 'Move current line down',
 			editorCallback(editor) 
 			{
-				const { line, ch } = editor.getCursor();
-				const lowerPosition = Math.min(editor.lastLine(), line + 1);
-				const selectedLine = editor.getLine(line);
-				const lineBelow = editor.getLine(lowerPosition);
-				
-				editor.setLine(lowerPosition, selectedLine);
-				editor.setLine(line, lineBelow);
-				editor.setCursor(lowerPosition, ch);
+				const cursors: Array<EditorSelectionOrCaret> = [];
+				const editorArray = editor.getValue().split('\n');
+				editor.listSelections().forEach(selection => 
+				{
+					const upperLine = Math.min(selection.head.line, selection.anchor.line);
+					const lowerLine = Math.max(selection.head.line, selection.anchor.line);
+					if (lowerLine === editor.lastLine()) return cursors.push(selection);
+					
+					const selectedLines = editorArray.splice(upperLine, lowerLine - upperLine + 1);
+					editorArray.splice(upperLine + 1, 0, ...selectedLines);
+
+					cursors.push({
+						head: { line: selection.head.line + 1, ch: selection.head.ch },
+						anchor: { line: selection.anchor.line + 1, ch: selection.anchor.ch },
+					});
+				});
+				editor.setValue(editorArray.join('\n'));
+				editor.setSelections(cursors);			
 			},
 			hotkeys: [{ key: 'ArrowDown', modifiers: ['Alt'] }],
 		});
@@ -45,12 +66,30 @@ export class VSCShortcuts extends Plugin
 			name: 'Copy current line down',
 			editorCallback(editor) 
 			{
-				const { line, ch } = editor.getCursor();
+				const cursors: Array<EditorSelectionOrCaret> = [];
 				const editorArray = editor.getValue().split('\n');
-				
-				editorArray[line] += '\n' + editorArray[line];
+				let cumulator = 0;
+				editor.listSelections().forEach(selection => 
+				{
+					selection.head.line += cumulator;
+					selection.anchor.line += cumulator;
+					const upperLine = Math.min(selection.head.line, selection.anchor.line);
+					const lowerLine = Math.max(selection.head.line, selection.anchor.line);
+					if (lowerLine === editor.lastLine()) return cursors.push(selection);
+					
+					const lineLength = lowerLine - upperLine + 1;
+					const selectedLines = editorArray.slice(upperLine, lowerLine + 1);
+					editorArray.splice(upperLine, 0, ...selectedLines);
+
+					cursors.push({
+						head: { line: selection.head.line + lineLength, ch: selection.head.ch },
+						anchor: { line: selection.anchor.line + lineLength, ch: selection.anchor.ch },
+					});
+
+					cumulator += lineLength;
+				});
 				editor.setValue(editorArray.join('\n'));
-				editor.setCursor(line + 1, ch);
+				editor.setSelections(cursors);			
 			},
 			hotkeys: [{ key: 'ArrowDown', modifiers: ['Alt', 'Shift'] }],
 		});
@@ -60,12 +99,29 @@ export class VSCShortcuts extends Plugin
 			name: 'Copy current line up',
 			editorCallback(editor) 
 			{
-				const { line, ch } = editor.getCursor();
+				const cursors: Array<EditorSelectionOrCaret> = [];
 				const editorArray = editor.getValue().split('\n');
-				
-				editorArray[line] += '\n' + editorArray[line];
+				let cumulator = 0;
+				editor.listSelections().forEach(selection => 
+				{
+					selection.head.line += cumulator;
+					selection.anchor.line += cumulator;
+					const upperLine = Math.min(selection.head.line, selection.anchor.line);
+					const lowerLine = Math.max(selection.head.line, selection.anchor.line);
+					if (lowerLine === editor.lastLine()) return cursors.push(selection);
+					
+					const selectedLines = editorArray.slice(upperLine, lowerLine + 1);
+					editorArray.splice(upperLine, 0, ...selectedLines);
+
+					cursors.push({
+						head: { line: selection.head.line, ch: selection.head.ch },
+						anchor: { line: selection.anchor.line, ch: selection.anchor.ch },
+					});
+
+					cumulator += lowerLine - upperLine + 1;
+				});
 				editor.setValue(editorArray.join('\n'));
-				editor.setCursor(line, ch);
+				editor.setSelections(cursors);			
 			},
 			hotkeys: [{ key: 'ArrowUp', modifiers: ['Alt', 'Shift'] }],
 		});
@@ -75,12 +131,22 @@ export class VSCShortcuts extends Plugin
 			name: 'Delete current line',
 			editorCallback(editor) 
 			{
-				const { line } = editor.getCursor();
 				const editorArray = editor.getValue().split('\n');
-				
-				editorArray.splice(line, 1);
-				editor.setValue(editorArray.join('\n'));
-				editor.setCursor(line);
+				const cursors: Array<EditorSelectionOrCaret> = [];
+				editor.listSelections().forEach((selection, index) => 
+				{
+					const { line } = selection.head;
+					delete editorArray[line];
+					cursors.push({ 
+						head: { line: line - index, ch: 0 },
+						anchor: { 
+							line: selection.anchor.line - index,
+							ch: 0,
+						}
+					});
+				});
+				editor.setValue(editorArray.filter((line) => typeof line).join('\n'));
+				editor.setSelections(cursors);
 			},
 			hotkeys: [{ key: 'k', modifiers: ['Ctrl', 'Shift'] }],
 		});
@@ -90,12 +156,25 @@ export class VSCShortcuts extends Plugin
 			name: 'Insert line below',
 			editorCallback(editor) 
 			{
-				const { line, ch } = editor.getCursor();
-				const editorArray = editor.getValue().split('\n');
-				
-				editorArray[line] += '\n';
-				editor.setValue(editorArray.join('\n'));
-				editor.setCursor(line, ch);
+				const cursors: Array<EditorSelectionOrCaret> = [];
+				editor.listSelections().forEach((selection, index) => 
+				{
+					const currentSelection = selection.head;
+					currentSelection.line += index;
+					const { line, ch } = currentSelection;
+					const editorArray = editor.getValue().split('\n');
+					
+					editorArray[line] += '\n';
+					editor.setValue(editorArray.join('\n'));
+					cursors.push({ 
+						head: { line, ch },
+						anchor: { 
+							line: selection.anchor.line + index,
+							ch: selection.anchor.ch,
+						}
+					});
+				});
+				editor.setSelections(cursors);
 			},
 			hotkeys: [{ key: 'Enter', modifiers: ['Ctrl'] }],
 		});
@@ -105,12 +184,25 @@ export class VSCShortcuts extends Plugin
 			name: 'Insert line above',
 			editorCallback(editor) 
 			{
-				const { line, ch } = editor.getCursor();
-				const editorArray = editor.getValue().split('\n');
-				
-				editorArray[line] = '\n' + editorArray[line];
-				editor.setValue(editorArray.join('\n'));
-				editor.setCursor(line + 1, ch);
+				const cursors: Array<EditorSelectionOrCaret> = [];
+				editor.listSelections().forEach((selection, index) => 
+				{
+					const currentSelection = selection.head;
+					currentSelection.line += index;
+					const { line, ch } = currentSelection;
+					const editorArray = editor.getValue().split('\n');
+					
+					editorArray[line] = '\n' + editorArray[line];
+					editor.setValue(editorArray.join('\n'));
+					cursors.push({ 
+						head: { line: line + 1, ch },
+						anchor: { 
+							line: selection.anchor.line + index + 1,
+							ch: selection.anchor.ch,
+						}
+					});
+				});
+				editor.setSelections(cursors);
 			},
 			hotkeys: [{ key: 'Enter', modifiers: ['Ctrl', 'Shift'] }],
 		});
